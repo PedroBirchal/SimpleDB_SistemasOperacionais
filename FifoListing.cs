@@ -1,9 +1,11 @@
-
+#nullable enable
 public class FifoListing<T> : Listing<T> where T : class{
 
     public FifoListing(int size, T rootValue){
         this.size = size;
         root = new Node<T>(rootValue);
+        tail = new Node<T>(rootValue,root);
+        root.next = tail;
         index = 0;
     }
 

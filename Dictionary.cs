@@ -15,12 +15,12 @@ public class Dictionary{
         if(policy == "fifo"){
             this.policy = policy;
             keys = new FifoListing<Key>(size, new Key(-1));
-            values = new FifoListing<string>(size, null);
+            values = new FifoListing<string>(size, "root");
         } 
         else if(policy == "lru"){
             this.policy = policy;
             keys = new LruListing<Key>(size, new Key(-1));
-            values = new LruListing<string>(size, null);
+            values = new LruListing<string>(size, "root");
         }
     }
 
@@ -103,11 +103,10 @@ public class Dictionary{
     //}
 }
 
-[Serializable]
 public class DictionaryEntity{
-    [JsonInclude] public Key[] keys;
-    [JsonInclude] public string[] values;
-    [JsonInclude] public string policy;
+    [JsonInclude] public Key[]? keys;
+    [JsonInclude] public string[]? values;
+    [JsonInclude] public string? policy;
     [JsonInclude] public int size;
 }
 

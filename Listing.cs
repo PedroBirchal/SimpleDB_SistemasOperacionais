@@ -1,9 +1,12 @@
+#nullable enable
+
 public abstract class Listing<T> where T : class{
     #region Atributes
-    public Node<T> root;
+    public  Node<T> root;
+    public  Node<T> tail;
     public int size;
     public int index;
-    public T[] elements;
+    public T[]? elements;
     #endregion
 
 
@@ -24,13 +27,11 @@ public abstract class Listing<T> where T : class{
             Console.WriteLine("Maximum capacity exceeded, replacement policy is going to be executed to allow insertion of new value.");
             ReplacePolicy();
         }
-        for(Node<T> i = root; i.next != null; root = root.next){
-            if(i.next == null){
-                i.next = new Node<T>(value);
-                return i.next;
-            }
-        }
-        return null;
+        Node<T> i = root;
+        for(; i.next != tail; root = root.next){}
+        Node<T> n = new Node<T>(value, tail);
+        i.next = n;
+        return n;
     }
     public virtual T Remove(int index){
         Node<T> n = root;
@@ -70,7 +71,7 @@ public abstract class Listing<T> where T : class{
 
     public virtual T[] ToArray(){
         T[] elem = new T[size];
-        for((Node<T> n, int i) = (root, 0); n.next != null; n = n.next){
+        for((Node<T> n, int i) = (root, 0); n.next != tail; n = n.next){
             elem[i] = n.next.value;
         }
         return elem;
@@ -82,14 +83,7 @@ public abstract class Listing<T> where T : class{
 
 public class Node<T>{
     #region Atributes
-    public T value{
-
-        get { return _value;}
-        set{
-            if(!_value.Equals(value)) _value = value;
-        }
-    }
-    private T _value;
+    public T value;
     public Node<T> next;
     #endregion
 

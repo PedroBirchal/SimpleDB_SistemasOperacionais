@@ -2,16 +2,18 @@
 public class DB{
 
     private Serializer serializer = new Serializer();
-    private Dictionary db;
+    public Dictionary db;
     
-    public void HandleArgs(string[] args){
 
-        db = serializer.LoadDB();
+    public DB(){}
+
+    public void HandleArgs(string[] args){
 
         if(args[0] == "-cache-size"){
             CacheSize(int.Parse(args[1]), args[2]);
             return;
         }
+        //db = serializer.LoadDB();
         if(args[0] == "--insert"){
             Insert(int.Parse(args[1]), args[2]);
             return;
@@ -32,6 +34,7 @@ public class DB{
     }
 
     public void Insert(int key, string value){
+        db = serializer.LoadDB();
         db.Insert(key, value);
         serializer.SaveDB(db.ToEntity());
     }
@@ -52,7 +55,7 @@ public class DB{
     }
 
     public void CacheSize(int size, string policy){
-        Dictionary db = new Dictionary(size,policy);
+        db = new Dictionary(size,policy);
         serializer.SaveDB(db.ToEntity());
     }
 }

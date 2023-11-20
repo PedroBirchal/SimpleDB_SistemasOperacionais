@@ -1,4 +1,3 @@
-#nullable enable
 
 public abstract class Listing<T> where T : class{
     #region Atributes
@@ -28,7 +27,7 @@ public abstract class Listing<T> where T : class{
             ReplacePolicy();
         }
         Node<T> i = root;
-        for(; i.next != tail; root = root.next){}
+        for(; i.next != tail; i = i.next){}
         Node<T> n = new Node<T>(value, tail);
         i.next = n;
         return n;
@@ -38,7 +37,7 @@ public abstract class Listing<T> where T : class{
         for(int i = 0; i < index; i++, n = n.next){}
         T removed = n.next.value;
         n.next = n.next.next;
-        index--;
+        this.index--;
         return removed;
     }
     protected virtual Node<T> GetAt(int index){
@@ -53,9 +52,9 @@ public abstract class Listing<T> where T : class{
         n.value = value.value;
     }
 
-    public virtual bool Search(T value, out int i){
+    public virtual bool Search(T value , out int i){
         i = 0;
-        for(Node<T> n = root; n.next != null; n = n.next, i++){
+        for(Node<T> n = root; n.next != tail; n = n.next, i++){
             if(n.next.value == value){
                 return true;
             }
@@ -71,7 +70,8 @@ public abstract class Listing<T> where T : class{
 
     public virtual T[] ToArray(){
         T[] elem = new T[size];
-        for((Node<T> n, int i) = (root, 0); n.next != tail; n = n.next){
+        Node<T> n = root;
+        for(int i = 0; n.next != tail; i++, n = n.next){
             elem[i] = n.next.value;
         }
         return elem;

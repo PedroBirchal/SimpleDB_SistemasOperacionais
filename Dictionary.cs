@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 public class Dictionary{
     #region Atributes
-    public Listing<Key> keys;
+    public Listing<Container> keys;
     public Listing<string> values;
     public string policy;
     #endregion
@@ -10,44 +10,20 @@ public class Dictionary{
 
     #region Constructors
     public Dictionary(int size, string policy){
-        if(size <= 0) throw new Exception ("Invalid size for data-base");
-        if(policy != "fifo" && policy != "lru") throw new Exception("Invalid policy");
+        this.policy = policy;
         if(policy == "fifo"){
-            this.policy = policy;
-            keys = new FifoListing<Key>(size, new Key(-1));
+            keys = new FifoListing<Container>(size, new Container(-1));
             values = new FifoListing<string>(size, "root");
         } 
-        else if(policy == "lru"){
-            this.policy = policy;
-            keys = new LruListing<Key>(size, new Key(-1));
-            values = new LruListing<string>(size, "root");
-        }
-    }
-
-    [JsonConstructor]
-    public Dictionary(DictionaryEntity db){
-        policy = db.policy;
-        
-        if(policy == "fifo"){
-            keys = new FifoListing<Key>(db.size, new Key(-1));
-            values = new FifoListing<string>(db.size, null);
-        } 
         else{
-            keys = new LruListing<Key>(db.size, new Key(-1));
-            values = new LruListing<string>(db.size, null);
-        }
-
-        for(int i = 0; i < db.keys.Length; i++){
-            keys.Add(db.keys[i]);
-            values.Add(db.values[i]);
+            keys = new LruListing<Container>(size, new Container(-1));
+            values = new LruListing<string>(size, "root");
         }
     }
     #endregion
 
     public void Insert(int keyValue, string value){
-        if(keyValue <= 0) throw new Exception($"Invalid key informed :{keyValue}");
-
-        Key key = new Key(keyValue);
+        Container key = new Container(keyValue);
         keys.Add(key);
         values.Add(value);
         Console.WriteLine($"Inserted new object : \"{value}\" in DataBase");
@@ -56,26 +32,24 @@ public class Dictionary{
 
     public void Remove(int keyValue){
         int indexPos;
-        Key key = new Key(keyValue);
 
-        if(keys.Search(key, out indexPos)){
+        if(Search(keyValue, out indexPos)){
             keys.Remove(indexPos);
             string removed = values.Remove(indexPos);
             Console.WriteLine($"Object : {removed} was removed from DataBase");
         }
-        else throw new Exception("The key value informed wasn't found on the DataBase");
+        else Console.WriteLine("The key value informed wasn't found on the DataBase");
     }
 
-    public bool Search(int keyValue, out int indexPos){
-        Key key = new Key(keyValue);
-        if(keys.Search(key, out indexPos)){
-            Console.WriteLine($" Object : {values.Print(indexPos)} was found with the {keyValue} key");
-            return true;
+    public bool Search(int keyValue, out int index){
+        for(index = 0; index < keys.size; index++){
+            if(keys[index].value.value == keyValue){
+                Console.WriteLine($" Object : {values.Print(index)} was found with the {keyValue} key");
+                return true;
+            }
         }
-        else{
-            Console.WriteLine($" No object was found with the {keyValue} key");
-            return false;
-        }
+        Console.WriteLine($" No object was found with the {keyValue} key");
+        return false;
     }
 
     public void Update(int keyValue, string updateValue){
@@ -84,34 +58,33 @@ public class Dictionary{
             values[pos].value = updateValue;
             Console.WriteLine($"Object with key : {keyValue} new value set to : {values[pos].value}");
         }
+        else Console.WriteLine($"No object was found with the {keyValue} key");
     }
 
     public DictionaryEntity ToEntity(){
-        DictionaryEntity de = new DictionaryEntity();
-        de.values = values.ToArray();
-        de.keys = keys.ToArray();
-        de.policy = policy;
+        DictionaryEntity de = new DictionaryEntity
+        {
+            values = values.ToArray(),
+            keys = keys.ToArray(),
+            policy = policy
+        };
         de.size = de.values.Length;
         return de;
     }
-
-    //[JsonConstructor]
-    //public Dictionary(int[] keys, string[] values, POLICY policy){
-    //    this.keys = keys;
-    //    this.values = values;
-    //    this.policy = policy;
-    //}
 }
 
+[Serializable]
 public class DictionaryEntity{
-    [JsonInclude] public Key[]? keys;
+    [JsonInclude] public Container[]? keys;
     [JsonInclude] public string[]? values;
     [JsonInclude] public string? policy;
     [JsonInclude] public int size;
+
+    public DictionaryEntity(){}
 }
 
-public class Key{
-    public int value;
+public class Container{
+    [JsonInclude] public int value;
 
-    public Key(int value){this.value = value;}
+    public Container(int value){this.value = value;}
 }

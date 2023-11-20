@@ -10,11 +10,14 @@ public class DB{
     public void HandleArgs(string[] args){
 
         if(args[0] == "-cache-size"){
+            if(int.Parse(args[1]) <= 0) throw new Exception ("Invalid size for data-base");
+            if(args[2] != "fifo" && args[2] != "lru") throw new Exception("Invalid policy");
             CacheSize(int.Parse(args[1]), args[2]);
             return;
         }
-        //db = serializer.LoadDB();
+        db = serializer.GetDB();
         if(args[0] == "--insert"){
+            if(int.Parse(args[1]) <= 0) throw new Exception($"Invalid key informed :{args[1]}");
             Insert(int.Parse(args[1]), args[2]);
             return;
         }
@@ -34,7 +37,6 @@ public class DB{
     }
 
     public void Insert(int key, string value){
-        db = serializer.LoadDB();
         db.Insert(key, value);
         serializer.SaveDB(db.ToEntity());
     }

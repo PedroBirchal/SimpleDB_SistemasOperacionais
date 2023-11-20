@@ -15,6 +15,8 @@ public class Serializer{
     }
 
     public Dictionary LoadDB(){
+        string sourceFile = (File.ReadAllText(fileName));
+        Console.WriteLine(sourceFile);
         return new Dictionary(JsonSerializer.Deserialize<DictionaryEntity>(File.ReadAllText(fileName)));
     }
 
